@@ -42,16 +42,28 @@ namespace TestXlsx
 
                         foreach (Row row in rows)
                         {
-                            int i = 1;
+                            
                             ArrayList infoAboutProduct = new ArrayList();
                             foreach (Cell c in row.Elements<Cell>())
                             {
                                 if ((c.DataType != null) && (c.DataType == CellValues.SharedString))
                                 {
+
                                     int ssid = int.Parse(c.CellValue.Text);
                                     string str = sst.ChildElements[ssid].InnerText;
+                                    if ((str == "Код")|(str == "Артикул")|(str == "Наименование")|(str == "Пр -ль")|
+                                            (str == "Ед. изм")|(str =="Розничная цена, руб")|(str =="Нормоупаковка")|
+                                            (str == "Цена от нормоупаковки,руб")|(str=="Изображение")|(str =="Ваш заказ"))
+                                    {
+                                        continue;
+                                    }
+                                    else 
+                                    {
+                                        infoAboutProduct.Add(str);
+                                    }
 
-                                    infoAboutProduct.Add(str);
+
+                                    
                                 }
                                 else if (c.CellValue != null)
                                 {
@@ -62,7 +74,7 @@ namespace TestXlsx
                             try
                             {
 
-                                newFile.WriteLine("Код: {0} Артикул: {1} Наименование: {2} Производитель: {3} Ед. изм. : {4} Цена : {5};",
+                                newFile.WriteLine("Код: {0} Артикул: {1} Наименование: {2} Производитель: {3} Ед. изм.: {4} Розничная цена, руб: {5};",
                                 infoAboutProduct[0], infoAboutProduct[1], infoAboutProduct[2], infoAboutProduct[3], infoAboutProduct[4],
                                 infoAboutProduct[5]);
                             }
