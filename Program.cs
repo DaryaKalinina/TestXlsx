@@ -35,9 +35,7 @@ namespace TestXlsx
 
                         WorksheetPart worksheetPart = workbookPart.WorksheetParts.First();
                         Worksheet sheet = worksheetPart.Worksheet;
-                        //количество столбцев 
-                        //var cells = sheet.Descendants<Cell>();
-                        //количество строк
+                                                
                         var rows = sheet.Descendants<Row>();
 
                         foreach (Row row in rows)
@@ -51,15 +49,16 @@ namespace TestXlsx
 
                                     int ssid = int.Parse(c.CellValue.Text);
                                     string str = sst.ChildElements[ssid].InnerText;
-                                    if ((str == "Код")|(str == "Артикул")|(str == "Наименование")|(str == "Пр -ль")|
-                                            (str == "Ед. изм")|(str =="Розничная цена, руб")|(str =="Нормоупаковка")|
-                                            (str == "Цена от нормоупаковки,руб")|(str=="Изображение")|(str =="Ваш заказ"))
+                                    
+                                    if ((str != "Код")&(str != "Артикул")&(str != "Наименование")&(str != "Пр -ль")&
+                                            (str != "Ед. изм")&(str !="Розничная цена, руб")&(str !="Нормоупаковка")&
+                                            (str != "Цена от нормоупаковки,руб")&(str!="Изображение")&(str !="Ваш заказ"))
                                     {
-                                        continue;
+                                        infoAboutProduct.Add(str); 
                                     }
                                     else 
                                     {
-                                        infoAboutProduct.Add(str);
+                                        continue;
                                     }
 
 
@@ -67,18 +66,31 @@ namespace TestXlsx
                                 }
                                 else if (c.CellValue != null)
                                 {
-                                    infoAboutProduct.Add(c.CellValue.Text);
+                                    
+                                    string check = c.CellReference;
+                                    if (check[0] == 'F')
+                                    {
+                                        int price = Convert.ToInt32(c.CellValue.Text);
+                                        string result = String.Format("{0:N}", price);
+                                        infoAboutProduct.Add(result + "р");
+                                    }
+                                    else
+                                    {
+                                        infoAboutProduct.Add(c.CellValue.Text);
+                                    }
+                                                                        
+                                    
                                 }
 
                             }
                             try
                             {
-
-                                newFile.WriteLine("Код: {0} Артикул: {1} Наименование: {2} Производитель: {3} Ед. изм.: {4} Розничная цена, руб: {5};",
+                            
+                                newFile.WriteLine("Код: {0}, Артикул: {1}, Наименование: {2}, Производитель: {3}, Единица измерения: {4}, Розничная цена: {5}.",
                                 infoAboutProduct[0], infoAboutProduct[1], infoAboutProduct[2], infoAboutProduct[3], infoAboutProduct[4],
                                 infoAboutProduct[5]);
                             }
-                            catch
+                            catch (ArgumentOutOfRangeException)
                             {
                                 //игнорировать exception
                                 continue;
@@ -92,7 +104,7 @@ namespace TestXlsx
 
                 }
             }
-            catch (FileNotFoundException e)
+            catch (FileNotFoundException)
             {
                 Console.WriteLine("Файл не найден");
             }
